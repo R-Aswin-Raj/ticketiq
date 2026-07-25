@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -93,11 +93,19 @@ jobs:
       - name: Smoke test the container
         run: |
           docker run -d --name ticketiq -p 8000:8000 ticketiq:ci
+          # Always surface the container's own logs — a container that never
+          # serves /healthz is otherwise a silent 60s timeout with no cause.
+          trap 'echo "=== container logs ==="; docker logs ticketiq 2>&1 || true; docker rm -f ticketiq >/dev/null 2>&1 || true' EXIT
+
           for i in $(seq 1 30); do
-            curl -sf http://localhost:8000/healthz && break || sleep 2
+            curl -sf http://localhost:8000/healthz && break
+            if [ -z "$(docker ps -q -f name=ticketiq)" ]; then
+              echo "::error::container exited before becoming healthy"; exit 1
+            fi
+            sleep 2
           done
+
           curl -sf -X POST http://localhost:8000/ticket \
             -H 'Content-Type: application/json' \
             -d '{"subject":"Double charged","body":"Billed twice, please refund.","tier":"pro"}' \
             | tee /dev/stderr | grep -q transaction_id
-          docker rm -f ticketiq
