@@ -1,0 +1,22 @@
+services:
+  ticketiq:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Switch to local/cloud here; see .env.example for the full list.
+      LLM_MODE: ${LLM_MODE:-mock}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      CLOUD_BASE_URL: ${CLOUD_BASE_URL:-https://api.openai.com/v1}
+      CLOUD_MODEL: ${CLOUD_MODEL:-gpt-4o-mini}
+      CLOUD_API_KEY: ${CLOUD_API_KEY:-}
+      BANDIT_EPSILON: ${BANDIT_EPSILON:-0.15}
+    volumes:
+      # Persist bandit state and the SQLite pipeline store across restarts.
+      - ticketiq-data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  ticketiq-data:
