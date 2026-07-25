@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install poetry && poetry install
+      - run: pip install poetry && poetry config virtualenvs.create false && poetry install
       - name: ruff
         run: ruff check ticketiq tests scripts
       - name: black
@@ -44,7 +44,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
-      - run: pip install poetry && poetry install
+      - run: pip install poetry && poetry config virtualenvs.create false && poetry install
       - name: pytest with coverage
         run: pytest --cov --cov-report=term-missing --cov-report=xml --cov-fail-under=80
       - name: Upload coverage
@@ -63,7 +63,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install poetry && poetry install
+      - run: pip install poetry && poetry config virtualenvs.create false && poetry install
       # Fails if the bandit stops beating a uniform-random router.
       - name: Bandit learning check
         run: python scripts/bandit_simulation.py --rounds 8000 --json /tmp/rl.json
