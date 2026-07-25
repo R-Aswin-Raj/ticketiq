@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-
 from ticketiq.rl.bandit import ArmStats, ContextualBandit, compute_reward, state_key
 
 ARMS = ["a", "b", "c"]

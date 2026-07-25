@@ -11,7 +11,6 @@ from __future__ import annotations
 import asyncio
 
 import pytest
-
 from ticketiq.llm.base import LLMResult
 
 
@@ -42,7 +41,10 @@ def test_post_ticket_returns_every_required_field(client, sample_tickets) -> Non
 
     assert body["transaction_id"].startswith("txn_")
     assert body["classification"]["category"] in (
-        "billing", "technical", "account", "feature_request"
+        "billing",
+        "technical",
+        "account",
+        "feature_request",
     )
     assert 0.0 <= body["classification"]["confidence"] <= 1.0
     assert 1 <= len(body["aspects"]) <= 3
@@ -87,7 +89,9 @@ def test_agent_trace_is_inspectable(client, sample_tickets) -> None:
 
 
 def test_transaction_ids_are_unique(client, sample_tickets) -> None:
-    ids = {client.post("/ticket", json=sample_tickets[0]).json()["transaction_id"] for _ in range(3)}
+    ids = {
+        client.post("/ticket", json=sample_tickets[0]).json()["transaction_id"] for _ in range(3)
+    }
     assert len(ids) == 3
 
 
@@ -113,7 +117,15 @@ def test_status_reflects_real_stage_state(client, sample_tickets) -> None:
 
     assert body["pipeline_status"] == "completed"
     names = [s["name"] for s in body["stages"]]
-    assert names == ["classify", "aspects", "urgency", "select_config", "retrieve", "agent", "respond"]
+    assert names == [
+        "classify",
+        "aspects",
+        "urgency",
+        "select_config",
+        "retrieve",
+        "agent",
+        "respond",
+    ]
     assert all(s["status"] == "completed" for s in body["stages"])
     # Not a hardcoded response: each stage carries its own persisted output.
     classify = next(s for s in body["stages"] if s["name"] == "classify")
@@ -217,9 +229,7 @@ def test_end_to_end_with_patched_llm(isolated_env, monkeypatch, sample_tickets) 
                 )
             return LLMResult(text="Here is your answer.", model="fake", latency_s=0.01)
 
-    monkeypatch.setattr(
-        "ticketiq.pipeline.stages.client_for_arm", lambda arm_id: FakeLLM()
-    )
+    monkeypatch.setattr("ticketiq.pipeline.stages.client_for_arm", lambda arm_id: FakeLLM())
 
     from ticketiq.pipeline.service import apply_feedback, get_status, process_ticket
     from ticketiq.schemas import TicketRequest

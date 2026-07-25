@@ -27,7 +27,7 @@ from ticketiq.workflow.state import StateStore, get_state_store
 logger = logging.getLogger(__name__)
 
 
-class UnknownTransaction(KeyError):
+class UnknownTransactionError(KeyError):
     """Raised when a transaction id has no recorded state."""
 
 
@@ -102,7 +102,7 @@ def apply_feedback(
     store = store or get_state_store()
     decision = store.get_decision(transaction_id)
     if decision is None:
-        raise UnknownTransaction(transaction_id)
+        raise UnknownTransactionError(transaction_id)
 
     reward = compute_reward(score, decision.latency_s)
     stats = get_bandit().update(decision.state, decision.arm_id, reward)
@@ -110,7 +110,11 @@ def apply_feedback(
     persist_bandit()
     logger.info(
         "feedback txn=%s state=%s arm=%s reward=%.3f pulls=%d",
-        transaction_id, decision.state, decision.arm_id, reward, stats.pulls,
+        transaction_id,
+        decision.state,
+        decision.arm_id,
+        reward,
+        stats.pulls,
     )
     return FeedbackResponse(
         transaction_id=transaction_id,
@@ -121,14 +125,12 @@ def apply_feedback(
     )
 
 
-def get_status(
-    transaction_id: str, *, store: StateStore | None = None
-) -> TicketStatusResponse:
+def get_status(transaction_id: str, *, store: StateStore | None = None) -> TicketStatusResponse:
     """Report real per-stage state from the workflow store."""
     store = store or get_state_store()
     run = store.get_run(transaction_id)
     if run is None:
-        raise UnknownTransaction(transaction_id)
+        raise UnknownTransactionError(transaction_id)
 
     records = {r.stage: r for r in store.get_stages(transaction_id)}
     workflow = get_workflow()
@@ -163,13 +165,10 @@ async def rerun_stage(
     store = store or get_state_store()
     run = store.get_run(transaction_id)
     if run is None:
-        raise UnknownTransaction(transaction_id)
+        raise UnknownTransactionError(transaction_id)
     workflow = get_workflow()
     if stage not in workflow.stages:
         raise KeyError(f"unknown stage {stage!r}")
-    downstream = [
-        name
-        for name in workflow.order()[workflow.order().index(stage) :]
-    ]
+    downstream = list(workflow.order()[workflow.order().index(stage) :])
     await workflow.run(transaction_id, run["request"], store, resume=True, only=downstream)
     return get_status(transaction_id, store=store)

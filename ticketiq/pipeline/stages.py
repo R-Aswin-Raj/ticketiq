@@ -48,9 +48,7 @@ async def stage_classify(ctx: StageContext) -> dict[str, Any]:
 
 async def stage_aspects(ctx: StageContext) -> dict[str, Any]:
     """Aspect extraction and per-aspect sentiment."""
-    aspects = await asyncio.to_thread(
-        extract_aspects, ctx.request["subject"], ctx.request["body"]
-    )
+    aspects = await asyncio.to_thread(extract_aspects, ctx.request["subject"], ctx.request["body"])
     return {
         "aspects": [
             {
@@ -201,7 +199,9 @@ def build_workflow() -> Workflow:
     return Workflow(
         name="ticket_triage",
         stages=[
-            Stage("classify", stage_classify, (), "TF-IDF + logistic-regression category prediction"),
+            Stage(
+                "classify", stage_classify, (), "TF-IDF + logistic-regression category prediction"
+            ),
             Stage("aspects", stage_aspects, (), "Aspect extraction and per-aspect sentiment"),
             Stage("urgency", stage_urgency, ("classify", "aspects"), "Urgency score and RL state"),
             Stage("select_config", stage_select_config, ("urgency",), "Bandit arm selection"),

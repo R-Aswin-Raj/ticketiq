@@ -5,7 +5,6 @@ from __future__ import annotations
 import math
 
 import pytest
-
 from ticketiq.ml.classifier import TicketClassifier, train_and_evaluate
 from ticketiq.ml.dataset import LabelledTicket, load_dataset, stratified_split
 from ticketiq.ml.logistic_regression import SoftmaxRegression
@@ -143,7 +142,9 @@ def test_logreg_gradient_descent_reduces_the_loss() -> None:
 
     def train_nll(epochs: int) -> float:
         model = SoftmaxRegression(epochs=epochs).fit(X, labels, vec.n_features)
-        return -sum(math.log(model.predict_proba_one(x)[y]) for x, y in zip(X, labels))
+        return -sum(
+            math.log(model.predict_proba_one(x)[y]) for x, y in zip(X, labels, strict=False)
+        )
 
     assert train_nll(200) < train_nll(2)
 
@@ -188,7 +189,7 @@ def test_stratified_split_preserves_class_balance() -> None:
     train, test = stratified_split(tickets, test_size=0.25, seed=3)
     assert len(test) == 10
     assert len({t.category for t in test}) == 2
-    assert not set(id(t) for t in train) & set(id(t) for t in test)
+    assert not {id(t) for t in train} & {id(t) for t in test}
 
 
 def test_split_rejects_invalid_test_size() -> None:

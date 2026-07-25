@@ -35,9 +35,18 @@ VALID_ACTIONS = ("answer_directly", "tool_call", "escalate")
 
 HARD_ESCALATION_PATTERNS: tuple[tuple[str, str], ...] = (
     (r"\bdata loss\b|\blost all (our|my) data\b", "Possible data loss reported."),
-    (r"\b(lawyer|legal action|regulator|gdpr complaint|chargeback)\b", "Legal or regulatory exposure."),
-    (r"\bsecurity (incident|breach)\b|\bbreach\b|\bunauthori[sz]ed access\b", "Possible security incident."),
-    (r"\bproduction (is )?down\b|\bcomplete outage\b|\ball users (are )?(down|blocked)\b", "Full outage reported."),
+    (
+        r"\b(lawyer|legal action|regulator|gdpr complaint|chargeback)\b",
+        "Legal or regulatory exposure.",
+    ),
+    (
+        r"\bsecurity (incident|breach)\b|\bbreach\b|\bunauthori[sz]ed access\b",
+        "Possible security incident.",
+    ),
+    (
+        r"\bproduction (is )?down\b|\bcomplete outage\b|\ball users (are )?(down|blocked)\b",
+        "Full outage reported.",
+    ),
 )
 
 
@@ -67,9 +76,10 @@ class AgentContext:
         )
 
     def render_summary(self) -> str:
-        aspects = ", ".join(
-            f"{a['aspect']}={a['sentiment']:+.2f}" for a in self.aspects
-        ) or "none detected"
+        aspects = (
+            ", ".join(f"{a['aspect']}={a['sentiment']:+.2f}" for a in self.aspects)
+            or "none detected"
+        )
         return (
             f"Subject: {self.subject}\n"
             f"Body: {self.body}\n"
@@ -176,7 +186,9 @@ class ReActAgent:
         observation_block = ""
 
         if action == "escalate":
-            reason = str(decision.get("escalation_reason") or "Model judged human review necessary.")
+            reason = str(
+                decision.get("escalation_reason") or "Model judged human review necessary."
+            )
             result.action = "escalate"
             result.escalation_reason = reason
             result.reasoning.append(f"Decision: escalate — {reason}")
@@ -190,19 +202,13 @@ class ReActAgent:
 
         result.action = "tool_call" if result.tool_calls else "answer_directly"
         result.response_text = await self._complete(
-            ANSWER_TEMPLATE.format(
-                summary=summary, context=context, observation=observation_block
-            )
+            ANSWER_TEMPLATE.format(summary=summary, context=context, observation=observation_block)
         )
         return result
 
     # -- internals ------------------------------------------------------
-    async def _decide(
-        self, summary: str, context: str, result: AgentResult
-    ) -> dict[str, Any]:
-        prompt = DECISION_TEMPLATE.format(
-            summary=summary, context=context, tools=describe_tools()
-        )
+    async def _decide(self, summary: str, context: str, result: AgentResult) -> dict[str, Any]:
+        prompt = DECISION_TEMPLATE.format(summary=summary, context=context, tools=describe_tools())
         try:
             completion = await self.client.complete(
                 prompt,
@@ -226,9 +232,7 @@ class ReActAgent:
             result.reasoning.append(f"Thought: {thought}")
         return decision
 
-    def _invoke_tool(
-        self, decision: dict[str, Any], ctx: AgentContext, result: AgentResult
-    ) -> str:
+    def _invoke_tool(self, decision: dict[str, Any], ctx: AgentContext, result: AgentResult) -> str:
         tool_name = str(decision.get("tool") or "")
         raw_args = decision.get("arguments")
         arguments: dict[str, Any] = dict(raw_args) if isinstance(raw_args, dict) else {}
@@ -240,9 +244,7 @@ class ReActAgent:
             arguments["order_id"] = ctx.order_id or f"order-{abs(hash(ctx.body)) % 99999}"
 
         observation = run_tool(tool_name, arguments)
-        result.tool_calls.append(
-            {"tool": tool_name, "arguments": arguments, "result": observation}
-        )
+        result.tool_calls.append({"tool": tool_name, "arguments": arguments, "result": observation})
         result.reasoning.append(f"Action: {tool_name}({arguments})")
         result.reasoning.append(f"Observation: {observation}")
 

@@ -75,9 +75,7 @@ class Environment:
         return 10.0 * self.satisfaction_prob(category, bucket, tier, arm_id) - mean_latency
 
     def best_arm(self, category: str, bucket: str, tier: str) -> tuple[str, float]:
-        scores = {
-            arm.id: self.expected_reward(category, bucket, tier, arm.id) for arm in ARMS
-        }
+        scores = {arm.id: self.expected_reward(category, bucket, tier, arm.id) for arm in ARMS}
         best = max(scores, key=lambda a: scores[a])
         return best, scores[best]
 
@@ -142,8 +140,13 @@ def run_simulation(
         matches += int(learned == true_best)
         variant_matches += int(get_arm(learned).variant_id == get_arm(true_best).variant_id)
         per_state.append(
-            {"state": state, "pulls": pulls, "learned": learned, "oracle": true_best,
-             "match": learned == true_best}
+            {
+                "state": state,
+                "pulls": pulls,
+                "learned": learned,
+                "oracle": true_best,
+                "match": learned == true_best,
+            }
         )
 
     # Reference points: what a uniform-random router and an oracle would score.
@@ -229,9 +232,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rounds", type=int, default=4000)
     parser.add_argument("--epsilon", type=float, default=0.15)
-    parser.add_argument(
-        "--strategy", choices=("epsilon_greedy", "ucb1"), default="epsilon_greedy"
-    )
+    parser.add_argument("--strategy", choices=("epsilon_greedy", "ucb1"), default="epsilon_greedy")
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--plot", action="store_true", help="write data/bandit_learning.png")
     parser.add_argument("--json", type=Path, default=None, help="dump the full result")

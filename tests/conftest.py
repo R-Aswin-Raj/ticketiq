@@ -66,7 +66,6 @@ def state_store(isolated_env: Path):
 @pytest.fixture
 def client(isolated_env: Path):
     from fastapi.testclient import TestClient
-
     from ticketiq.main import app
 
     with TestClient(app) as test_client:

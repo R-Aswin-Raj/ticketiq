@@ -149,7 +149,9 @@ class ContextualBandit:
 
             if self._rng.random() < self.epsilon:
                 arm = self._rng.choice(self.arms)
-                return Selection(state, arm, True, f"epsilon-greedy exploration (eps={self.epsilon})")
+                return Selection(
+                    state, arm, True, f"epsilon-greedy exploration (eps={self.epsilon})"
+                )
 
             arm = max(row, key=lambda a: (row[a].mean_reward, a))
             return Selection(state, arm, False, "greedy: highest mean reward")
@@ -175,9 +177,7 @@ class ContextualBandit:
                 "strategy": self.strategy,
                 "epsilon": self.epsilon,
                 "arms": self.arms,
-                "total_pulls": sum(
-                    s.pulls for row in self._table.values() for s in row.values()
-                ),
+                "total_pulls": sum(s.pulls for row in self._table.values() for s in row.values()),
                 "states": {
                     state: {
                         arm: {
@@ -212,10 +212,7 @@ class ContextualBandit:
                 "ucb_c": self.ucb_c,
                 "arms": self.arms,
                 "table": {
-                    state: {
-                        arm: [s.pulls, s.mean_reward, s.total_reward]
-                        for arm, s in row.items()
-                    }
+                    state: {arm: [s.pulls, s.mean_reward, s.total_reward] for arm, s in row.items()}
                     for state, row in self._table.items()
                 },
             }

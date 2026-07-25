@@ -28,10 +28,24 @@ CATEGORY_WEIGHT: dict[str, float] = {
 }
 
 ESCALATION_PATTERNS: tuple[str, ...] = (
-    r"\burgent\b", r"\basap\b", r"\bimmediately\b", r"\bcritical\b", r"\bp1\b",
-    r"\bproduction (is )?down\b", r"\boutage\b", r"\bblocked\b", r"\bcancel\b",
-    r"\bchurn\b", r"\blegal\b", r"\blawyer\b", r"\bescalat", r"\brefund\b",
-    r"\bentire team\b", r"\ball users\b", r"\bdata loss\b", r"\bsecurity\b",
+    r"\burgent\b",
+    r"\basap\b",
+    r"\bimmediately\b",
+    r"\bcritical\b",
+    r"\bp1\b",
+    r"\bproduction (is )?down\b",
+    r"\boutage\b",
+    r"\bblocked\b",
+    r"\bcancel\b",
+    r"\bchurn\b",
+    r"\blegal\b",
+    r"\blawyer\b",
+    r"\bescalat",
+    r"\brefund\b",
+    r"\bentire team\b",
+    r"\ball users\b",
+    r"\bdata loss\b",
+    r"\bsecurity\b",
 )
 
 W_TIER, W_CATEGORY, W_SENTIMENT, W_KEYWORDS = 0.30, 0.25, 0.30, 0.15

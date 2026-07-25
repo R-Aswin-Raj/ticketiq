@@ -28,8 +28,7 @@ def main() -> None:
     clf, report = train_and_evaluate(test_size=args.test_size, seed=args.seed)
 
     print(f"dataset: {settings.dataset_path}")
-    print(f"vocabulary: {clf.vectorizer.n_features} features "
-          f"(TF-IDF, unigrams + bigrams)\n")
+    print(f"vocabulary: {clf.vectorizer.n_features} features " f"(TF-IDF, unigrams + bigrams)\n")
     print(f"--- held-out report (seed={args.seed}) ---")
     print(report.render())
 

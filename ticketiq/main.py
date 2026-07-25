@@ -14,8 +14,8 @@ Endpoints
 from __future__ import annotations
 
 import logging
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
@@ -25,7 +25,7 @@ from ticketiq import __version__
 from ticketiq.config import get_settings
 from ticketiq.llm.factory import describe_model
 from ticketiq.pipeline.service import (
-    UnknownTransaction,
+    UnknownTransactionError,
     apply_feedback,
     get_status,
     process_ticket,
@@ -73,8 +73,8 @@ app = FastAPI(
 )
 
 
-@app.exception_handler(UnknownTransaction)
-async def _unknown_transaction_handler(_: Any, exc: UnknownTransaction) -> JSONResponse:
+@app.exception_handler(UnknownTransactionError)
+async def _unknown_transaction_handler(_: Any, exc: UnknownTransactionError) -> JSONResponse:
     return JSONResponse(status_code=404, content={"detail": f"unknown transaction {exc.args[0]}"})
 
 
@@ -104,7 +104,7 @@ async def post_feedback(request: FeedbackRequest) -> FeedbackResponse:
     """Record 1/0 feedback and update the bandit for the arm that was used."""
     try:
         return apply_feedback(request.transaction_id, request.score)
-    except UnknownTransaction as exc:
+    except UnknownTransactionError as exc:
         raise HTTPException(
             status_code=404, detail=f"unknown transaction {request.transaction_id}"
         ) from exc
@@ -115,8 +115,10 @@ async def get_ticket_status(transaction_id: str) -> TicketStatusResponse:
     """Per-stage completion state, read from the workflow engine's store."""
     try:
         return get_status(transaction_id)
-    except UnknownTransaction as exc:
-        raise HTTPException(status_code=404, detail=f"unknown transaction {transaction_id}") from exc
+    except UnknownTransactionError as exc:
+        raise HTTPException(
+            status_code=404, detail=f"unknown transaction {transaction_id}"
+        ) from exc
 
 
 @app.post("/ticket/{transaction_id}/rerun/{stage}", response_model=TicketStatusResponse)
@@ -124,8 +126,10 @@ async def post_rerun_stage(transaction_id: str, stage: str) -> TicketStatusRespo
     """Re-run a failed stage without repeating completed upstream stages."""
     try:
         return await rerun_stage(transaction_id, stage)
-    except UnknownTransaction as exc:
-        raise HTTPException(status_code=404, detail=f"unknown transaction {transaction_id}") from exc
+    except UnknownTransactionError as exc:
+        raise HTTPException(
+            status_code=404, detail=f"unknown transaction {transaction_id}"
+        ) from exc
     except KeyError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

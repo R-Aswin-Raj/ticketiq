@@ -120,9 +120,7 @@ class StateStore:
                 (transaction_id, now, now, json.dumps(request)),
             )
 
-    def set_run_status(
-        self, transaction_id: str, status: str, error: str | None = None
-    ) -> None:
+    def set_run_status(self, transaction_id: str, status: str, error: str | None = None) -> None:
         with self._tx() as conn:
             conn.execute(
                 "UPDATE runs SET status = ?, updated_at = ?, error = ? WHERE transaction_id = ?",
@@ -157,9 +155,7 @@ class StateStore:
                 (transaction_id, stage, time.time()),
             )
 
-    def complete_stage(
-        self, transaction_id: str, stage: str, output: dict[str, Any]
-    ) -> None:
+    def complete_stage(self, transaction_id: str, stage: str, output: dict[str, Any]) -> None:
         with self._tx() as conn:
             conn.execute(
                 "UPDATE stages SET status = 'completed', finished_at = ?, output = ?, "

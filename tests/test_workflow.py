@@ -6,7 +6,6 @@ import asyncio
 import time
 
 import pytest
-
 from ticketiq.workflow.engine import (
     Stage,
     StageContext,
@@ -37,9 +36,7 @@ def test_levels_group_independent_stages_together() -> None:
 
 
 def test_a_linear_chain_produces_one_stage_per_level() -> None:
-    wf = Workflow(
-        "w", [Stage("a", noop), Stage("b", noop, ("a",)), Stage("c", noop, ("b",))]
-    )
+    wf = Workflow("w", [Stage("a", noop), Stage("b", noop, ("a",)), Stage("c", noop, ("b",))])
     assert wf.levels == [["a"], ["b"], ["c"]]
 
 

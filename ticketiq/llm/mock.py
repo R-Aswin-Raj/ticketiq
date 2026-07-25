@@ -22,8 +22,18 @@ from typing import Any
 from ticketiq.llm.base import LLMResult
 
 _ESCALATION_MARKERS = (
-    "outage", "production down", "production is down", "data loss", "security",
-    "legal", "lawyer", "regulator", "chargeback", "cancel", "churn", "escalate",
+    "outage",
+    "production down",
+    "production is down",
+    "data loss",
+    "security",
+    "legal",
+    "lawyer",
+    "regulator",
+    "chargeback",
+    "cancel",
+    "churn",
+    "escalate",
 )
 _REFUND_MARKERS = ("refund", "double charged", "overcharge", "duplicate", "money back")
 _ACCOUNT_MARKERS = ("locked", "sso", "saml", "password", "mfa", "sign in", "log in", "login")
@@ -58,7 +68,7 @@ class MockLLM:
         await asyncio.sleep(delay)
         text = (
             self._decide(prompt)
-            if "respond with json" in prompt.lower() or "\"action\"" in prompt
+            if "respond with json" in prompt.lower() or '"action"' in prompt
             else self._answer(prompt, system)
         )
         return LLMResult(

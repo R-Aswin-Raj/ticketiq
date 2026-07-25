@@ -115,7 +115,7 @@ class SoftmaxRegression:
         if not self.classes_:
             raise RuntimeError("model is not trained")
         probs = _softmax(self._logits(vec))
-        return {c: p for c, p in zip(self.classes_, probs, strict=True)}
+        return dict(zip(self.classes_, probs, strict=True))
 
     def predict_one(self, vec: SparseVector) -> tuple[str, float, dict[str, float]]:
         proba = self.predict_proba_one(vec)

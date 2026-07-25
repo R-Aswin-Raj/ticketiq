@@ -5,7 +5,6 @@ from __future__ import annotations
 import asyncio
 
 import pytest
-
 from ticketiq.agent.react import AgentContext, ReActAgent, hard_escalation_reason
 from ticketiq.agent.tools import check_account_status, check_refund_eligibility, run_tool
 from ticketiq.llm.base import extract_json
@@ -256,7 +255,10 @@ def test_extract_json_repairs_single_quotes() -> None:
 
 def test_extract_json_repair_never_corrupts_valid_json() -> None:
     # An apostrophe inside a value must not be mangled by the single-quote repair.
-    assert extract_json('{"thought": "it\'s locked", "action": "escalate"}')["thought"] == "it's locked"
+    assert (
+        extract_json('{"thought": "it\'s locked", "action": "escalate"}')["thought"]
+        == "it's locked"
+    )
 
 
 def test_extract_json_returns_empty_on_garbage() -> None:
@@ -282,18 +284,18 @@ def test_hard_escalation_does_not_fire_on_ordinary_tickets() -> None:
 
 
 def _context(**overrides) -> AgentContext:
-    base = dict(
-        subject="Double charged",
-        body="We were billed twice and would like a refund.",
-        tier="pro",
-        category="billing",
-        urgency=0.5,
-        urgency_bucket="medium",
-        aspects=[{"aspect": "billing", "sentiment": -0.6, "label": "negative", "evidence": "x"}],
-        snippets=[],
-        customer_id="cust-1",
-        order_id="ord-1",
-    )
+    base = {
+        "subject": "Double charged",
+        "body": "We were billed twice and would like a refund.",
+        "tier": "pro",
+        "category": "billing",
+        "urgency": 0.5,
+        "urgency_bucket": "medium",
+        "aspects": [{"aspect": "billing", "sentiment": -0.6, "label": "negative", "evidence": "x"}],
+        "snippets": [],
+        "customer_id": "cust-1",
+        "order_id": "ord-1",
+    }
     base.update(overrides)
     return AgentContext(**base)  # type: ignore[arg-type]
 

@@ -95,9 +95,7 @@ def load_kb(kb_dir: Path, *, chunk_size: int = 480, overlap: int = 80) -> list[C
     chunks: list[Chunk] = []
     for path in sorted(kb_dir.glob("*.md")):
         raw = path.read_text(encoding="utf-8")
-        chunks.extend(
-            chunk_markdown(raw, path.stem, chunk_size=chunk_size, overlap=overlap)
-        )
+        chunks.extend(chunk_markdown(raw, path.stem, chunk_size=chunk_size, overlap=overlap))
     if not chunks:
         raise ValueError(f"no markdown documents found in {kb_dir}")
     return chunks

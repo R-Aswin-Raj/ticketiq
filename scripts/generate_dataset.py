@@ -142,18 +142,58 @@ URGENT_SUFFIX = [
 # another, plus terse tickets with little signal. Without these the templated
 # corpus is linearly separable and the reported metrics are meaningless.
 HARD_CASES: list[tuple[str, str, str]] = [
-    ("billing", "Cannot access invoices", "I can log in fine but the billing page shows access denied when I try to download a receipt."),
-    ("billing", "Refund request after outage", "The platform was down for two days so we are requesting a partial refund for the affected period."),
-    ("billing", "Upgrade blocked", "The upgrade button errors out, so we are still on the old plan and being charged the old rate."),
-    ("account", "Charged for a user I removed", "I deactivated a teammate but they still have access to the workspace. Seat management seems broken."),
-    ("account", "Login page very slow", "The sign in page takes forever to load and eventually rejects my password. I am locked out."),
+    (
+        "billing",
+        "Cannot access invoices",
+        "I can log in fine but the billing page shows access denied when I try to download a receipt.",
+    ),
+    (
+        "billing",
+        "Refund request after outage",
+        "The platform was down for two days so we are requesting a partial refund for the affected period.",
+    ),
+    (
+        "billing",
+        "Upgrade blocked",
+        "The upgrade button errors out, so we are still on the old plan and being charged the old rate.",
+    ),
+    (
+        "account",
+        "Charged for a user I removed",
+        "I deactivated a teammate but they still have access to the workspace. Seat management seems broken.",
+    ),
+    (
+        "account",
+        "Login page very slow",
+        "The sign in page takes forever to load and eventually rejects my password. I am locked out.",
+    ),
     ("account", "Please remove my data", "Delete my account and everything associated with it."),
-    ("technical", "Report export shows wrong totals", "The numbers in the exported report do not match the dashboard, which affects the amounts we invoice clients."),
-    ("technical", "Dark mode causes rendering bug", "After enabling the new dark theme the charts render blank and the page crashes."),
+    (
+        "technical",
+        "Report export shows wrong totals",
+        "The numbers in the exported report do not match the dashboard, which affects the amounts we invoice clients.",
+    ),
+    (
+        "technical",
+        "Dark mode causes rendering bug",
+        "After enabling the new dark theme the charts render blank and the page crashes.",
+    ),
     ("technical", "Slow", "Everything is slow today."),
-    ("feature_request", "Refund automation", "Could you add a way for admins to issue refunds from the billing dashboard themselves?"),
-    ("feature_request", "SSO for smaller plans", "We would like SAML single sign on to be available on the pro plan, not just enterprise."),
-    ("feature_request", "Alert on failed syncs", "It would help if the product notified us when a sync fails instead of us discovering it later."),
+    (
+        "feature_request",
+        "Refund automation",
+        "Could you add a way for admins to issue refunds from the billing dashboard themselves?",
+    ),
+    (
+        "feature_request",
+        "SSO for smaller plans",
+        "We would like SAML single sign on to be available on the pro plan, not just enterprise.",
+    ),
+    (
+        "feature_request",
+        "Alert on failed syncs",
+        "It would help if the product notified us when a sync fails instead of us discovering it later.",
+    ),
     ("billing", "Question", "Quick question about my last payment."),
     ("account", "Help", "I need help getting back into my workspace."),
     ("technical", "Errors everywhere", "Getting errors on nearly every page since this morning."),

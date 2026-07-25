@@ -53,9 +53,7 @@ class StageContext:
         try:
             return self.outputs[stage]
         except KeyError as exc:
-            raise WorkflowError(
-                f"stage {stage!r} output requested before it completed"
-            ) from exc
+            raise WorkflowError(f"stage {stage!r} output requested before it completed") from exc
 
 
 @dataclass(frozen=True)
@@ -84,9 +82,7 @@ class Workflow:
         for stage in self.stages.values():
             for dep in stage.depends_on:
                 if dep not in self.stages:
-                    raise WorkflowError(
-                        f"stage {stage.name!r} depends on unknown stage {dep!r}"
-                    )
+                    raise WorkflowError(f"stage {stage.name!r} depends on unknown stage {dep!r}")
                 if dep == stage.name:
                     raise WorkflowError(f"stage {stage.name!r} depends on itself")
 
@@ -184,9 +180,7 @@ class Workflow:
                 if len(pending) == 1:
                     await self._run_stage(pending[0], ctx, store)
                 else:
-                    await asyncio.gather(
-                        *(self._run_stage(name, ctx, store) for name in pending)
-                    )
+                    await asyncio.gather(*(self._run_stage(name, ctx, store) for name in pending))
         except Exception as exc:
             store.set_run_status(transaction_id, "failed", error=str(exc))
             raise

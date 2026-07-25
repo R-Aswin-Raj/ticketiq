@@ -78,9 +78,7 @@ class VectorStore:
             return
         with self._lock:
             self._chunks.extend(chunks)
-            self._heading_tokens.extend(
-                set(tokenize(f"{c.heading} {c.title}")) for c in chunks
-            )
+            self._heading_tokens.extend(set(tokenize(f"{c.heading} {c.title}")) for c in chunks)
             texts = [c.embedding_text for c in self._chunks]
             if self.embedder is not None:
                 self._dense = self.embedder.embed_many(texts)

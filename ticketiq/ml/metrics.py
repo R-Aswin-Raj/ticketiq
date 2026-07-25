@@ -34,9 +34,7 @@ class EvaluationReport:
             f"{'class':<16}{'prec':>8}{'rec':>8}{'f1':>8}{'n':>6}",
         ]
         for name, m in sorted(self.per_class.items()):
-            lines.append(
-                f"{name:<16}{m.precision:>8.3f}{m.recall:>8.3f}{m.f1:>8.3f}{m.support:>6}"
-            )
+            lines.append(f"{name:<16}{m.precision:>8.3f}{m.recall:>8.3f}{m.f1:>8.3f}{m.support:>6}")
         return "\n".join(lines)
 
 
