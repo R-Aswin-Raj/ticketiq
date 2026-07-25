@@ -2,7 +2,9 @@
 FROM python:3.13-slim AS builder
 
 ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
-WORKDIR /build
+# Build the venv at the same absolute path it lives at runtime, so poetry's
+# console-script shebangs (e.g. /app/.venv/bin/uvicorn) resolve after the COPY.
+WORKDIR /app
 
 RUN pip install poetry \
  && poetry config virtualenvs.in-project true
@@ -25,7 +27,7 @@ ENV PYTHONUNBUFFERED=1 \
     LLM_MODE=mock \
     DATA_DIR=/app/data
 
-COPY --from=builder /build/.venv /app/.venv
+COPY --from=builder /app/.venv /app/.venv
 
 WORKDIR /app
 COPY ticketiq/ ./ticketiq/
